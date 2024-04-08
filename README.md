@@ -1,6 +1,7 @@
 ## My personal RAT (Remote Administration Tool) project
 
 ### Currently under development.
+I know that a lot of my code right now is bad but I will improve it later.
 
 #### The current architecture is:
 1. "Innocent" service that serves at a stupid injector (currently using basic dll injection because it doesn't really matter, every normal injection method is already known by AntiViruses).
