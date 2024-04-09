@@ -23,6 +23,10 @@ AutoHandle& AutoHandle::operator=(AutoHandle&& other) noexcept {
     return *this;
 }
 
+AutoHandle::operator HANDLE() {
+    return handle;
+}
+
 void AutoHandle::Close() {
     if (handle != INVALID_HANDLE_VALUE) {
         CloseHandle(handle);

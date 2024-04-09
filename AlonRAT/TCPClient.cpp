@@ -33,6 +33,7 @@ void TCPClient::reconnect() {
         WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
         wsa_cleanup();
     }
+    m_is_connected = true;
 }
 
 void TCPClient::send_data(const char* data) {
@@ -62,6 +63,7 @@ const std::shared_ptr<char*> TCPClient::receive(int size) {
 }
 
 void TCPClient::disconnect() {
+    m_is_connected = false;
     WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);
     WINAPI_OBFUSCATE(wsa_cleanup_type, "WSACleanup", "ws2_32")();
 }

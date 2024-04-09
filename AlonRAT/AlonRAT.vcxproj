@@ -157,6 +157,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="TCPClient.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="winapi_types.h" />
     <ClInclude Include="windows_structs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

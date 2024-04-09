@@ -7,7 +7,7 @@ I know that a lot of my code right now is bad but I will improve it later.
 1. "Innocent" service that serves at a stupid injector (currently using basic dll injection because it doesn't really matter, every normal injection method is already known by AntiViruses).
 2. The service injects the AlonRAT dll into a system process like `svchost.exe` or `winlogon.exe`, I haven't decided yet.
 3. The tool queries the c&c server in intervals.
-4. Both PEs will be hardly obfuscated by string obfuscator and winapi obfuscator (using the peb and dynamic loading).
+4. Both PEs are hardly obfuscated by string obfuscator and winapi obfuscator (using the peb and dynamic loading).
 
 
 
@@ -18,10 +18,12 @@ I know that a lot of my code right now is bad but I will improve it later.
 ## Some cool ideas I will probably implement:
 1. Encryption of the on-disk dll.
 2. Encrypt the code that access the peb.
-3. Inject to more processes to make this tool harded to uninstall.
+3. Inject to more processes to make some backups if one of the threads crashes.
 4. Anti Wireshark like tools.
 5. Anti debugging.
-6. Anti virust toal (sleeps, get a key from the server to enter a suspicious flow).
+6. Anti virust total (sleeps, get a key from the server to enter a suspicious flow).
+7. Automatic backdoors insertion.
+8. Encrypted communication with an AES key.
 
 
 ## Contribution

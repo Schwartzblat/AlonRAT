@@ -13,6 +13,8 @@ private:
     int m_port;
 
 public:
+    bool m_is_connected;
+
     TCPClient(const char* ip_address, const int port);
 
     ~TCPClient();

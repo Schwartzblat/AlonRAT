@@ -62,7 +62,7 @@ std::string exec(const char* CommandLine, const HANDLE token) {
         ZeroMemory(&startupInfo, sizeof(STARTUPINFO));
         startupInfo.cb = sizeof(startupInfo);
         startupInfo.dwFlags |= STARTF_USESTDHANDLES;
-        startupInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+        startupInfo.hStdInput = WINAPI_OBFUSCATE(get_std_handle_type, "GetStdHandle", "kernel32")(STD_INPUT_HANDLE);
         startupInfo.hStdOutput = stdOutWrite;
         startupInfo.hStdError = stdOutWrite;
         startupInfo.dwFlags |= STARTF_USESHOWWINDOW;

@@ -32,5 +32,8 @@
     <ClInclude Include="windows_structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="winapi_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

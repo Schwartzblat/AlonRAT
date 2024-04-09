@@ -19,6 +19,8 @@ public:
 
     AutoHandle& operator=(AutoHandle&& other) noexcept;
 
+    operator HANDLE();
+
     void Close();
 
     operator HANDLE() const {
