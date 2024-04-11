@@ -4,7 +4,8 @@
 TCPClient::TCPClient(const char* ip_address, const int port)
     : m_sockfd(0),
     m_ip_address(ip_address),
-    m_port(port)
+    m_port(port),
+    m_is_connected(false)
 {}
 
 TCPClient::~TCPClient() {

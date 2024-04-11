@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)\Shared;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -133,14 +136,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Shared\AutoHandle.cpp" />
     <ClCompile Include="Injector.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="obfuscate.h" />
+    <ClInclude Include="..\Shared\AutoHandle.h" />
+    <ClInclude Include="..\Shared\config.h" />
+    <ClInclude Include="..\Shared\obfuscate.h" />
+    <ClInclude Include="..\Shared\winapi_types.h" />
+    <ClInclude Include="..\Shared\windows_structs.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="winapi_types.h" />
-    <ClInclude Include="windows_structs.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

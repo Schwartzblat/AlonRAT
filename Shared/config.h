@@ -10,3 +10,4 @@ const char* THREAT_PROCESSES[] = {
 	OBFUSCATE("tshark.exe"),
 	OBFUSCATE("netcap.exe")
 };
+const char* MUTEX_NAME = "identity_mutex";

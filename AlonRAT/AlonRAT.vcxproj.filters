@@ -18,9 +18,6 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AutoHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="TCPClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -30,17 +27,11 @@
     <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="obfuscate.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="..\Shared\AutoHandle.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AutoHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TCPClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -50,10 +41,19 @@
     <ClInclude Include="utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="windows_structs.h">
+    <ClInclude Include="..\Shared\AutoHandle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winapi_types.h">
+    <ClInclude Include="..\Shared\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\obfuscate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\winapi_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\windows_structs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

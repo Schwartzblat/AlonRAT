@@ -1,6 +1,4 @@
 #include "AutoHandle.h"
-#include <Windows.h>
-#include <utility>
 
 AutoHandle::AutoHandle() : handle(nullptr) {}
 

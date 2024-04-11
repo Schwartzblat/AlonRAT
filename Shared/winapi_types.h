@@ -2,6 +2,7 @@
 #include <WS2tcpip.h>
 #include <windows.h>
 #include <tlhelp32.h>
+#include <Psapi.h>
 
 typedef decltype(LoadLibraryA)* load_library_type;
 typedef decltype(GetProcAddress)* get_proc_address_type;
@@ -36,3 +37,7 @@ typedef decltype(send)* send_type;
 typedef decltype(recv)* recv_type;
 typedef decltype(OpenProcessToken)* open_process_token_type;
 typedef decltype(CreateProcessAsUserA)* create_process_as_user_a_type;
+typedef decltype(CreateMutexA)* create_mutex_a_type;
+typedef decltype(FreeLibraryAndExitThread)* free_library_and_exit_thread_type;
+typedef decltype(EnumProcessModules)* enum_process_modules_type;
+typedef decltype(GetModuleFileNameExA)* get_module_filename_ex_a_type;

