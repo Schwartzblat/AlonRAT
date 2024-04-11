@@ -76,7 +76,6 @@ bool free_library_ex(DWORD pid, HMODULE address) {
     return true;
 }
 
-
 bool free_if_loaded(DWORD pid, const char* dll_store_path) {
     open_process_type open_process = WINAPI_OBFUSCATE(open_process_type, "OpenProcess", "kernel32");
     enum_process_modules_type enum_process_modules = WINAPI_OBFUSCATE(enum_process_modules_type, "EnumProcessModules", "psapi");
@@ -134,14 +133,10 @@ int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cm
     }
     initilize_winapi();
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
-
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
+
     while (1) {
-        AutoHandle mutex = create_mutex_a(
-            0,
-            false,
-            MUTEX_NAME
-        );
+        AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
         if (nullptr == mutex) {
             continue;
         }
@@ -149,6 +144,7 @@ int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cm
         const auto pid = get_pid(PROCESS_NAME);
         free_if_loaded(pid, DLL_PATH);
         bool result = inject(pid, DLL_PATH);
+
         sleep(1000 * SLEEP_BETWEEN_INJECTIONS);
     }
     return 0;

