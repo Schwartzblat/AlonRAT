@@ -124,10 +124,10 @@ namespace ay
 		~obfuscated_data()
 		{
 			// Zero m_data to remove it from memory
-			for (size_type i = 0; i < N; i++)
+			/*for (size_type i = 0; i < N; i++)
 			{
 				m_data[i] = 0;
-			}
+			}*/
 		}
 
 		// Returns a pointer to the plain text string, decrypting it if

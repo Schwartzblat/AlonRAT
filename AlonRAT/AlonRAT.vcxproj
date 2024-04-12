@@ -80,6 +80,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <UseStructuredOutput>false</UseStructuredOutput>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuildStartupDirectory)\Shared</IncludePath>
+    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuildStartupDirectory)\Shared</ExternalIncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x64);$(MSBuildStartupDirectory)\Shared</ReferencePath>
+    <SourcePath>$(VC_SourcePath);$(MSBuildStartupDirectory)\Shared</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>

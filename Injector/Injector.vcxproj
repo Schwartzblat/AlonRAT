@@ -73,6 +73,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)\Shared;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(CommonExecutablePath);$(MSBuildStartupDirectory)\Shared</ExecutablePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(MSBuildStartupDirectory)\Shared</IncludePath>
+    <ExternalIncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(MSBuildStartupDirectory)\Shared</ExternalIncludePath>
+    <ReferencePath>$(VC_ReferencesPath_x64);$(MSBuildStartupDirectory)\Shared</ReferencePath>
+    <SourcePath>$(VC_SourcePath);$(MSBuildStartupDirectory)\Shared</SourcePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>

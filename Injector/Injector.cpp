@@ -83,8 +83,7 @@ bool free_if_loaded(DWORD pid, const char* dll_store_path) {
     HMODULE hMods[1024];
     AutoHandle hProcess;
     DWORD cbNeeded;
-    hProcess = open_process(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-        FALSE, pid);
+    hProcess = open_process(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
     if (NULL == hProcess) {
         return false;
     }
@@ -105,7 +104,6 @@ bool free_if_loaded(DWORD pid, const char* dll_store_path) {
 
 
 DWORD get_pid(const char* process_name) {
-    DWORD pid = 0;
     create_toolhelp_snapshot_type create_toolhelp_snapshot = WINAPI_OBFUSCATE(create_toolhelp_snapshot_type, "CreateToolhelp32Snapshot", "kernel32");
     process32_first_type process32_first = WINAPI_OBFUSCATE(process32_first_type, "Process32First", "kernel32");
     process32_next_type process32_next = WINAPI_OBFUSCATE(process32_next_type, "Process32Next", "kernel32");
@@ -119,12 +117,11 @@ DWORD get_pid(const char* process_name) {
             std::string name = std::string(reinterpret_cast<char*>(pe32.szExeFile));
             std::transform(name.begin(), name.end(), name.begin(), ::tolower); // to lower
             if (strcmp(name.c_str(), process_name) == 0) {
-                pid = pe32.th32ProcessID;
-                break;
+                return pe32.th32ProcessID;
             }
         } while (process32_next(hSnapshot, &pe32));
     }
-    return pid;
+    return 0;
 }
 
 int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cmd_line, int n_cmd_show) {
@@ -134,7 +131,6 @@ int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cm
     initilize_winapi();
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
-
     while (1) {
         AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
         if (nullptr == mutex) {
