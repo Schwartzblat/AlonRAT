@@ -130,13 +130,13 @@ int CALLBACK WinMain(HINSTANCE h_instance, HINSTANCE h_prev_instance, LPSTR p_cm
     }
     initilize_winapi();
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
+    wait_for_single_object_type wait_for_single_object = WINAPI_OBFUSCATE(wait_for_single_object_type, "WaitForSingleObject", "kernel32");
+    release_mutex_type release_mutex = WINAPI_OBFUSCATE(release_mutex_type, "ReleaseMutex", "kernel32");
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
+    AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
     while (1) {
-        AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
-        if (nullptr == mutex) {
-            continue;
-        }
-        mutex.~AutoHandle();
+        wait_for_single_object(mutex, INFINITE);
+        release_mutex(mutex);
         const auto pid = get_pid(PROCESS_NAME);
         free_if_loaded(pid, DLL_PATH);
         bool result = inject(pid, DLL_PATH);
