@@ -1,0 +1,25 @@
+#include <windows.h>
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1, 0, 0, 0
+PRODUCTVERSION 1, 0, 0, 0
+BEGIN
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "040904E4" // English (United States) language and Unicode character set
+BEGIN
+VALUE "CompanyName", "Microsoft Corporation\0"
+VALUE "FileDescription", "Windows Injector Service\0"
+VALUE "FileVersion", "1.0.0.0\0"
+VALUE "InternalName", "injector\0"
+VALUE "OriginalFilename", "injector.exe\0"
+VALUE "ProductName", "Microsoft® Windows® Operating System\0"
+VALUE "ProductVersion", "1.0.0.0\0"
+VALUE "LegalCopyright", "© Microsoft Corporation. All rights reserved.\0"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x409, 1252
+END
+END
