@@ -63,6 +63,12 @@ const std::shared_ptr<char*> TCPClient::receive(int size) {
     return data;
 }
 
+const std::shared_ptr<char*> TCPClient::receive(int size, size_t* bytes_received) {
+    auto data = std::make_shared<char*>(new char[size]);
+    *bytes_received = WINAPI_OBFUSCATE(recv_type, "recv", "ws2_32")(m_sockfd, *data, size, 0);
+    return data;
+}
+
 void TCPClient::disconnect() {
     m_is_connected = false;
     WINAPI_OBFUSCATE(close_socket_type, "closesocket", "ws2_32")(m_sockfd);

@@ -27,5 +27,7 @@ public:
 
     const std::shared_ptr<char*> receive(int size);
 
+    const std::shared_ptr<char*> receive(int size, size_t* bytes_received);
+
     void disconnect();
 };

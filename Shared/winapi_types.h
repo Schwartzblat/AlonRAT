@@ -44,3 +44,6 @@ typedef decltype(GetModuleFileNameExA)* get_module_filename_ex_a_type;
 typedef decltype(CreateThread)* create_thread_type;
 typedef decltype(WaitForSingleObject)* wait_for_single_object_type;
 typedef decltype(ReleaseMutex)* release_mutex_type;
+typedef decltype(CreateFileA)* create_file_a_type;
+typedef decltype(WriteFile)* write_file_type;
+typedef decltype(ReadFile)* read_file_type;

